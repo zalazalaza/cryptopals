@@ -1,20 +1,12 @@
-import base64, itertools
+import base64
 from prob0107 import ECB
 from prob0210 import CBC
 from prob0211 import ORACLE
-from Cryptodome.Cipher import AES
 from prob0209 import PKCS7
 from Cryptodome import Random
+from Cryptodome.Cipher import AES
 from Cryptodome.Random import random
 from Cryptodome.Cipher.AES import block_size
-
-variable = """Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkg
-aGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBq
-dXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUg
-YnkK"""
-
-dummy_bytes = bytes([17]*61)
-
 
 class ECB_BREAKING_ORACLE:
     cipher = ECB()
@@ -52,6 +44,11 @@ class ECB_BREAKING_ORACLE:
 
 
 if __name__ =="__main__":
+    variable = """Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkg
+    aGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBq
+    dXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUg
+    YnkK"""
+    dummy_bytes = bytes([17]*61)
     oracle = ORACLE()
     breaking_oracle = ECB_BREAKING_ORACLE()
-    print(breaking_oracle.break_ECB(variable), breaking_oracle.get_blocksize("A"), oracle.find_which_cipher(breaking_oracle.encrypt_ECB(dummy_bytes)))
+    print("***********", breaking_oracle.get_blocksize("A"), " bytes per block ", oracle.find_which_cipher(breaking_oracle.encrypt_ECB(dummy_bytes))," ***************** \n", (breaking_oracle.break_ECB(variable)))
