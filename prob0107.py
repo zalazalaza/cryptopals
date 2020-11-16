@@ -5,13 +5,15 @@ data = base64.b64decode(open('7.txt', 'r').read())
 
 key = b"YELLOW SUBMARINE"
 
-def decryptECB(ciphertext, key):
-    cipher = AES.new(key, AES.MODE_ECB)
-    return cipher.decrypt(ciphertext)
+class ECB:
+    def decryptECB(self, ciphertext, key):
+        cipher = AES.new(key, AES.MODE_ECB)
+        return cipher.decrypt(ciphertext)
 
-def encryptECB(plaintext, key):
-    cipher = AES.new(key, AES.MODE_ECB)
-    return cipher.encrypt(plaintext)
+    def encryptECB(self, plaintext, key):
+        cipher = AES.new(key, AES.MODE_ECB)
+        return cipher.encrypt(plaintext)
 
 if __name__=="__main__":
-    print(decryptECB(data, key), encryptECB(decryptECB(data, key),key))
+    cipher = ECB()
+    print(cipher.decryptECB(data, key), cipher.encryptECB(cipher.decryptECB(data, key),key))
