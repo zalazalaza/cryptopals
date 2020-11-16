@@ -13,42 +13,45 @@ aGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBq
 dXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUg
 YnkK"""
 
-class ECB_ORACLE:
-    key=random_key(block_size)
-    thispkcs7 =PKCS7()
+dummy_bytes = bytes([17]*61)
+
+
+class ECB_BREAKING_ORACLE:
+    cipher = ECB()
+    key = Random.new().read(block_size)
+    thispkcs7 = PKCS7()
 
     def encrypt_ECB(self, plaintext):
-        encrypted = encryptECB(self.thispkcs7.PKCS7_padding(plaintext, len(self.key)), self.key)
+        encrypted = self.cipher.encryptECB(self.thispkcs7.PKCS7_padding(plaintext, len(self.key)), self.key)
         return encrypted
 
+    def get_blocksize(self, sample_byte):
+        my_cipher = ECB()
+        i=0
+        while True:
+            i += 1
+            if i == len(self.encrypt_ECB(sample_byte*i)):
+                return i
 
+    def break_ECB(self, plaintext):
+        answer = ""
+        for i in range(len(plaintext)):
+            array_of_tuples = []
+            length = (block_size - (len(answer)%block_size)) - 1
+            testbytestring = str.encode("A")*length
+            codewords = testbytestring + base64.b64decode(plaintext)
+            ciphertext = self.encrypt_ECB(codewords)
+            for x in range(255):
+                testword = testbytestring +str.encode(answer)+ str.encode(chr(x))
+                sample = self.encrypt_ECB(testword)
+                array_of_tuples.append((chr(x), sample))
+            for tuple in array_of_tuples:
+                if ciphertext[:len(tuple[1])] == tuple[1]:
+                    answer += tuple[0]
+        return answer
 
-def get_blocksize(sample_byte):
-    my_cipher = ECB_ORACLE()
-    i=0
-    while True:
-        i += 1
-        if i == len(my_cipher.encrypt_ECB(sample_byte*i)):
-            return i
-
-
-def break_ECB(plaintext, blocksize):
-    my_cipher =ECB_ORACLE()
-    answer = ""
-    for i in range(len(plaintext)):
-        tuplesoftuples = []
-        length = (blocksize - (len(answer)%blocksize)) - 1
-        testbytestring = str.encode("A")*length
-        codewords = testbytestring + base64.b64decode(plaintext)
-        ciphertext = my_cipher.encrypt_ECB(codewords)
-        for x in range(255):
-            testword = testbytestring +str.encode(answer)+ str.encode(chr(x))
-            sample = my_cipher.encrypt_ECB(testword)
-            tuplesoftuples.append((chr(x), sample))
-        for tuple in tuplesoftuples:
-            if ciphertext[:len(tuple[1])] == tuple[1]:
-                answer += tuple[0]
-    return answer
 
 if __name__ =="__main__":
-    print(break_ECB(variable, get_blocksize("D")))
+    oracle = ORACLE()
+    breaking_oracle = ECB_BREAKING_ORACLE()
+    print(breaking_oracle.break_ECB(variable), breaking_oracle.get_blocksize("A"), oracle.find_which_cipher(breaking_oracle.encrypt_ECB(dummy_bytes)))
