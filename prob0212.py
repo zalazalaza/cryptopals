@@ -5,7 +5,6 @@ from prob0211 import ORACLE
 from prob0209 import PKCS7
 from Cryptodome import Random
 from Cryptodome.Cipher import AES
-from Cryptodome.Random import random
 from Cryptodome.Cipher.AES import block_size
 
 class ECB_BREAKING_ORACLE:
