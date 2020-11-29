@@ -14,14 +14,6 @@ class ORACLE:
     def random_key(self, blockSize):
         return Random.new().read(blockSize)
 
-    def score_for_ECB(self, ciphertext, blockSize):
-        score = 0
-        blocks = [ciphertext[i:i+blockSize] for i in range(0, len(ciphertext), blockSize)]
-        pairs = itertools.combinations(blocks, 2)
-        for x,y in pairs:
-            if x == y:
-                score += 1
-        return score
 
     def prep_plaintext(self, plaintext):
         mypkcs7 = PKCS7()
@@ -38,14 +30,23 @@ class ORACLE:
             print("*****NOT CBC******")
             return device.encryptECB(pre_encryption_text, self.random_key(block_size))
 
-    def find_which_cipher(self, encrypted):
-        if self.score_for_ECB(encrypted, block_size) > 0:
-            return 'CIPHER USED WAS ECB'
-        else:
-            return 'CIPHER USED WAS CBC'
 
 
+def find_which_cipher(encrypted, blockSize):
+    if score_for_ECB(encrypted, blockSize) > 0:
+        return 'CIPHER USED WAS ECB'
+    else:
+        return 'CIPHER USED WAS CBC'
 
+
+def score_for_ECB(ciphertext, blockSize):
+    score = 0
+    blocks = [ciphertext[i:i+blockSize] for i in range(0, len(ciphertext), blockSize)]
+    pairs = itertools.combinations(blocks, 2)
+    for x,y in pairs:
+        if x == y:
+            score += 1
+    return score
 
 
 
@@ -54,4 +55,4 @@ class ORACLE:
 
 if __name__=="__main__":
     oracle = ORACLE()
-    print(oracle.find_which_cipher(oracle.choose_cipher(oracle.prep_plaintext(dummy_bytes))))
+    print(find_which_cipher(oracle.choose_cipher(oracle.prep_plaintext(dummy_bytes)), block_size))
