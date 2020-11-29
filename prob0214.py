@@ -1,12 +1,12 @@
 import base64
 from prob0107 import ECB
-from prob0210 import CBC
-from prob0211 import ORACLE
 from prob0209 import PKCS7
 from Cryptodome import Random
+from Cryptodome.Random import random
 from Cryptodome.Cipher import AES
 from Cryptodome.Cipher.AES import block_size
-from random import randint
+
+
 
 class HARDER_ECB_BREAKING_ORACLE:
     target = base64.b64decode("Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK")
@@ -18,10 +18,6 @@ class HARDER_ECB_BREAKING_ORACLE:
     def encrypt_ECB(self, plaintext):
         encrypted = self.cipher.encryptECB(self.thispkcs7.PKCS7_padding(self.rand_padding+plaintext+self.target, len(self.key)), self.key)
         return encrypted
-
-
-
-
 
 def get_blocksize(ECBoracle):
     base_encrypted = len(ECBoracle.encrypt_ECB(b""))
@@ -35,7 +31,7 @@ def makeblocks(text, blocksize):
     return [text[i:i+blocksize] for i in range(0, len(text), blocksize)]
 
 def break_ECB(oracle, prefix_size, blocksize):
-    checker = False#check if this character has been completed so as not to give any false matches
+    checker = False#check if this character has been completed so as not to give any false/double matches
     answer = b""
     addition = b"A"*((blocksize -(prefix_size%blocksize))+(blocksize-1))#one character less than full block
     ciphertext = oracle.encrypt_ECB(addition) #initial ciphertext before modifying our injected text
