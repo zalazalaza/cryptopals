@@ -78,4 +78,4 @@ if __name__ == "__main__" :
     oracle = HARDER_ECB_BREAKING_ORACLE()
     blocksize = get_blocksize(oracle)
     prefix_size = find_prefix_block_length(oracle,blocksize)
-    print(break_ECB(oracle,prefix_size, blocksize))
+    print(break_ECB(oracle,prefix_size, blocksize).decode())
